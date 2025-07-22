@@ -1,0 +1,17 @@
+/* style.css */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f1f3f4;
+  color: #202124;
+  text-align: center;
+  padding-top: 100px;
+}
+
+h2 {
+  color: #1a73e8;
+}
+
+#status {
+  font-weight: bold;
+  margin-top: 20px;
+}
