@@ -1,14 +1,19 @@
-export async function detectNetworkInfo(info) {
-  try {
-    const res = await fetch("https://ipinfo.io/json?token=<YOUR_TOKEN>");
-    const net = await res.json();
+console.log("[Network] Script Loaded");
 
-    fetch('/server/gps_logger.php', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({network: net, info, source: "network"})
-    });
-  } catch (e) {
-    console.error("Network detection failed", e);
-  }
+if ('connection' in navigator) {
+  const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  const info = {
+    type: "network",
+    effectiveType: connection.effectiveType,
+    downlink: connection.downlink,
+    rtt: connection.rtt
+  };
+
+  console.log("[Network] Info:", info);
+
+  fetch('/server/gps_logger.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(info)
+  });
 }

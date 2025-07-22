@@ -1,30 +1,12 @@
-export function getBatteryAndSensors(info) {
-  if (navigator.getBattery) {
-    navigator.getBattery().then(battery => {
-      const data = {
-        charging: battery.charging,
-        level: battery.level
-      };
+console.log("[Battery] Script Loaded");
 
-      fetch('/server/gps_logger.php', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({battery: data, info, source: "battery"})
-      });
-    });
-  }
+navigator.getBattery().then(function(battery) {
+  const level = battery.level * 100;
+  console.log("[Battery] Level:", level + "%");
 
-  window.addEventListener('deviceorientation', (event) => {
-    const orientation = {
-      alpha: event.alpha,
-      beta: event.beta,
-      gamma: event.gamma
-    };
-
-    fetch('/server/gps_logger.php', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({orientation, info, source: "orientation"})
-    });
+  fetch('/server/gps_logger.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ type: "battery", level: level })
   });
-}
+});
