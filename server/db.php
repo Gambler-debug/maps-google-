@@ -1,14 +1,16 @@
 <?php
-$host = getenv('DB_HOST');
-$db   = getenv('DB_NAME');
-$user = getenv('DB_USER');
-$pass = getenv('DB_PASS');
-$port = getenv('DB_PORT');
+$host = "dpg-d1v4q46r433s73fbo710-a.singapore-postgres.render.com";
+$db = "gpslogger_db_le25";
+$user = "gpslogger_db_le25_user";
+$pass = "gKTLm9wXgT31n1xFgMdqfpvz5R4QCRDP";
+$port = "5432";
 
 try {
-    $dsn = "pgsql:host=$host;port=$port;dbname=$db;";
-    $pdo = new PDO($dsn, $user, $pass, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+  $pdo = new PDO("pgsql:host=$host;port=$port;dbname=$db", $user, $pass);
+  $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+  echo "Connected successfully!";
 } catch (PDOException $e) {
-    die("Database connection failed: " . $e->getMessage());
+  echo "Database connection failed: " . $e->getMessage();
+  exit;
 }
 ?>

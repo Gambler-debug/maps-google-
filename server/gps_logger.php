@@ -1,22 +1,15 @@
 <?php
-// gps_logger.php
+include("db.php");
 
-$input = json_decode(file_get_contents('php://input'), true);
-
+$data = json_decode(file_get_contents("php://input"), true);
 $ip = $_SERVER['REMOTE_ADDR'];
-$timestamp = date("Y-m-d H:i:s");
+$lat = $data['latitude'] ?? '';
+$lon = $data['longitude'] ?? '';
+$acc = $data['accuracy'] ?? '';
+$agent = $_SERVER['HTTP_USER_AGENT'];
 
-$log = "=== $timestamp ===\n";
-$log .= "IP: $ip\n";
-$log .= "Latitude: {$input['lat']}\n";
-$log .= "Longitude: {$input['lon']}\n";
-$log .= "Accuracy: {$input['accuracy']} meters\n";
-$log .= "User Agent: {$input['info']['userAgent']}\n";
-$log .= "Screen: {$input['info']['screenWidth']}x{$input['info']['screenHeight']}\n";
-$log .= "Timezone: {$input['info']['timezone']}\n";
-$log .= "Language: {$input['info']['language']}\n";
-$log .= "=============================\n\n";
+$stmt = $pdo->prepare("INSERT INTO location_logs (ip_address, latitude, longitude, accuracy, user_agent) VALUES (?, ?, ?, ?, ?)");
+$stmt->execute([$ip, $lat, $lon, $acc, $agent]);
 
-file_put_contents("logs.txt", $log, FILE_APPEND);
+echo json_encode(["status" => "success"]);
 ?>
-

