@@ -1,13 +1,14 @@
 <?php
-$dotenv = parse_ini_file(__DIR__ . '/.env');
-
-$dsn = "pgsql:host={$dotenv['DB_HOST']};port={$dotenv['DB_PORT']};dbname={$dotenv['DB_NAME']}";
-$options = [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION];
+$host = getenv('DB_HOST');
+$db   = getenv('DB_NAME');
+$user = getenv('DB_USER');
+$pass = getenv('DB_PASS');
+$port = getenv('DB_PORT');
 
 try {
-    $pdo = new PDO($dsn, $dotenv['DB_USER'], $dotenv['DB_PASS'], $options);
+    $dsn = "pgsql:host=$host;port=$port;dbname=$db;";
+    $pdo = new PDO($dsn, $user, $pass, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
 } catch (PDOException $e) {
-    error_log("DB Connection Error: " . $e->getMessage());
-    die("Database error.");
+    die("Database connection failed: " . $e->getMessage());
 }
 ?>

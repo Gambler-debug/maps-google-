@@ -1,14 +1,18 @@
-# Use official PHP image
-FROM php:8.2-cli
+# Use PHP 8 with Apache
+FROM php:8.2-apache
 
-# Set working directory
-WORKDIR /app
+# Enable required PHP extensions
+RUN docker-php-ext-install pdo pdo_pgsql
 
-# Copy all files from repo to container
-COPY . .
+# Copy project files into Apache's web directory
+COPY ./public /var/www/html/
+COPY ./server /var/www/html/server/
 
-# Expose the port your app runs on
-EXPOSE 10000
+# Set proper permissions
+RUN chown -R www-data:www-data /var/www/html
 
-# Start PHP built-in server
-CMD ["php", "-S", "0.0.0.0:10000", "-t", "."]
+# Enable Apache mod_rewrite
+RUN a2enmod rewrite
+
+# Configure Apache to route .php correctly
+COPY .docker/vhost.conf /etc/apache2/sites-available/000-default.conf

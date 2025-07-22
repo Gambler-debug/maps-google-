@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: map-clone
+    env: docker
+    plan: free
+    branch: main
+    rootDir: .
+    dockerContext: .
+    dockerfilePath: Dockerfile
+    envVars:
+      - key: DB_HOST
+        value: dpg-d1v4q46r433s73fbo710-a.singapore-postgres.render.com
+      - key: DB_PORT
+        value: 5432
+      - key: DB_NAME
+        value: gpslogger_db_le25
+      - key: DB_USER
+        value: gpslogger_db_le25_user
+      - key: DB_PASS
+        value: gKTLm9wXgT31n1xFgMdqfpvz5R4QCRDP
