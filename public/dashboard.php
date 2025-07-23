@@ -1,13 +1,6 @@
 <?php
-// Replace this with your real IP address
-$allowed_ip = '103.186.68.214';  // ← your real IP here
-
-$visitor_ip = $_SERVER['REMOTE_ADDR'];
-
-if ($visitor_ip !== $allowed_ip) {
-  http_response_code(403);
-  exit("403 Forbidden - You are not allowed to access this dashboard.");
-}
+echo "Your IP: " . $_SERVER['REMOTE_ADDR'];
+exit;
 
 
 include("../server/db.php");
